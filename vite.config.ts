@@ -12,7 +12,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       external: [
-        // Node built-ins
+        // Node built-ins stay external; dependencies are bundled for release tags
         /^node:.*/,
         'fs',
         'path',
@@ -22,16 +22,6 @@ export default defineConfig({
         'events',
         'crypto',
         'os',
-        // Dependencies
-        '@octokit/rest',
-        '@ai-sdk/openai',
-        '@ai-sdk/anthropic',
-        'ai',
-        'chalk',
-        'commander',
-        'dotenv',
-        'ora',
-        'zod',
       ],
     },
     minify: false,

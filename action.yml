@@ -17,6 +17,10 @@ inputs:
     description: 'Directory to run commands in'
     required: false
     default: '.'
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
 
 outputs:
   date:
@@ -31,22 +35,11 @@ runs:
       with:
         fetch-depth: 0
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
-        cache: pnpm
-        cache-dependency-path: ${{ inputs.working-directory }}/pnpm-lock.yaml
-
-    - name: Install dependencies
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-      env:
-        INSTALL_ARGS: ${{ inputs.install-args }}
-      run: pnpm install $INSTALL_ARGS
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
 
     - id: resolve_date
       name: Resolve diary date
@@ -62,16 +55,32 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        AI_PROVIDER: ${{ inputs.ai-provider }}
-        AI_MODEL: ${{ inputs.ai-model }}
-        AI_API_KEY: ${{ inputs.ai-api-key }}
-        GH_TOKEN: ${{ inputs.gh-token }}
-        GH_USERNAME: ${{ inputs.gh-username }}
         WORKDIARY_OUTPUT_PATH: ${{ inputs.output-path }}
         NODE_OPTIONS: --enable-source-maps
         DIARY_DATE: ${{ steps.resolve_date.outputs.date }}
       run: |
-        pnpm diary --config "${{ inputs.config-path }}" ${DIARY_DATE:+--date "$DIARY_DATE"}
+        config_path="${{ inputs.config-path }}"
+
+        if [ -n "${{ inputs.config }}" ]; then
+          config_path="$(mktemp -p "$RUNNER_TEMP" workdiary-config-XXXX.yaml)"
+          printf '%s\n' "${{ inputs.config }}" > "$config_path"
+        fi
+
+        if [ -z "$config_path" ]; then
+          echo "::error ::Provide either 'config' (YAML string) or 'config-path' to a readable file" >&2
+          exit 1
+        fi
+
+        if [ ! -f "$config_path" ]; then
+          echo "::error ::Config file not found at '$config_path'. Provide 'config' or a valid 'config-path'." >&2
+          exit 1
+        fi
+
+        args=("--config" "$config_path")
+        if [ -n "$DIARY_DATE" ]; then
+          args+=("--date" "$DIARY_DATE")
+        fi
+        node dist/cli.js "${args[@]}"
 
 branding:
   icon: 'book'

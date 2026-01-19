@@ -1,95 +1,72 @@
 # Work Diary
 
-A TypeScript CLI tool that automatically generates daily work summaries from GitHub commits and PRs using AI.
+Generate a daily work log from your GitHub activity using AI. Available as a prebuilt GitHub Action and a local TypeScript CLI.
 
-## Features
+Features
 
-- 📊 Fetch commits and PRs from GitHub for a specific user and date
-- 🤖 Generate AI-powered summaries using LLMs (OpenAI, Anthropic)
-- 📝 Save summaries to your Obsidian vault
-- 🔄 Modular execution (fetch, summarize, publish steps)
-- ⚡ Built with modern TypeScript tooling (Vite, pnpm)
-- 🤖 Automated daily execution via GitHub Actions
+- Fetch Your daily activity, summarize with AI (OpenAI, Anthropic, Google), and outputs it to a file, console, for example to obsidian
+- Pluggable inputs/outputs (GitHub, email, Slack → Markdown → console/file)
 
-## Installation
+Use as a GitHub Action
 
-```bash
-pnpm install
+- Action ref: use a release tag (e.g., sergiocarracedo/workdiary@v1.0.0). Release tags contain only action.yml and dist/; dist/ stays ignored on main.
+- Config source: provide either a config file path (config-path, default workdiary.config.yaml) or inline YAML via config. The action fails if neither is provided or the path is unreadable.
+- Inputs
+  - config-path: string, default workdiary.config.yaml
+  - config: string, YAML; overrides config-path
+  - date: YYYY-MM-DD; defaults to today (UTC) when empty
+  - working-directory: string, default .
+  - node-version: string, default 20
+
+Minimal config example
+
+```yaml
+ai:
+ provider: openai
+ apiKey: env:OPENAI_API_KEY
+ model: gpt-4o-mini
+
+inputs:
+ - plugin: github
+  config:
+   token: env:GH_TOKEN
+   username: env:GH_USERNAME
+
+formatter:
+ plugin: markdown
+
+outputs:
+ - plugin: file
+  config:
+   path: 'obsidian/Daily Notes/{date}.md'
 ```
 
-## Configuration
+Workflow example
 
-Create a `.env` file:
+```yaml
+name: Daily Work Diary
+on:
+ schedule:
+  - cron: '15 7 * * *' # daily at 07:15 UTC
+ workflow_dispatch:
 
-```bash
-# GitHub Configuration
-GH_TOKEN=your_github_token
-GH_USERNAME=your_username
-
-# AI Configuration (choose one or more)
-OPENAI_API_KEY=your_openai_key
-ANTHROPIC_API_KEY=your_anthropic_key
-AI_PROVIDER=openai  # or anthropic
-
-# Obsidian Configuration
-OBSIDIAN_VAULT_PATH=/path/to/your/vault
+jobs:
+ diary:
+  runs-on: ubuntu-latest
+  steps:
+   - uses: actions/checkout@v4
+   - name: Work Diary
+    uses: sergiocarracedo/workdiary@v1.0.0
+    with:
+     config-path: workdiary.config.yaml
+     date: '' # optional; empty defaults to today UTC
+    env:
+     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+     GH_USERNAME: ${{ secrets.GH_USERNAME }}
 ```
 
-## Usage
+[CLI](CLI.md)
 
-```bash
-# Run the workflow (fetch → summarize → publish)
-pnpm diary
-
-# Specify date (defaults to today)
-pnpm diary --date 2026-01-13
-```
-
-## Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run tests
-pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Build
-pnpm build
-
-# Lint
-pnpm lint
-
-# Format
-pnpm format
-
-## Security checks
-
-- Pre-commit hooks run `git-secrets --scan` on staged files. Install git-secrets (https://github.com/awslabs/git-secrets) and register patterns (e.g., `git secrets --register-aws`) before committing.
-
-## How the CLI works
-
-- The `diary` script runs `src/cli.ts`, which loads `workdiary.config.yaml` (or `--config <file>`) and resolves any `env:VAR_NAME` placeholders against your environment variables.
-- It computes the target date (today by default, or `--date YYYY-MM-DD`) and builds a shared context with logging and date formatting.
-- Input plugins (GitHub, Slack, Email) run in parallel to fetch raw data and optionally summarize with your configured AI provider.
-- The formatter plugin turns the collected summaries into final output content.
-- Output plugins (console, file, etc.) write the formatted result to their destinations.
-```
-
-## Tech Stack
-
-- **Language**: TypeScript 5.7+
-- **Package Manager**: pnpm 10+
-- **Build Tool**: Vite 6+
-- **Testing**: Vitest 3+
-- **Linter**: oxlint (oxc)
-- **Formatter**: oxfmt (oxc)
-- **Git Hooks**: lefthook
-- **Commit Linting**: commitlint
-
-## License
-
+License
 MIT

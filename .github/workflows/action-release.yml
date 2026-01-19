@@ -1,0 +1,102 @@
+name: Bundle Action Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build and bundle'
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 10
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "name=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ github.event.inputs.tag }}" ]; then
+            echo "name=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error ::Tag name is required" >&2
+            exit 1
+          fi
+
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.tag.outputs.name }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with Vite
+        run: pnpm build
+
+      - name: Stage release bundle
+        run: |
+          mkdir -p /tmp/workdiary-bundle
+          cp -r dist /tmp/workdiary-bundle/dist
+          cp action.yml /tmp/workdiary-bundle/action.yml
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: workdiary-action-${{ steps.tag.outputs.name }}
+          path: |
+            /tmp/workdiary-bundle/dist
+            /tmp/workdiary-bundle/action.yml
+          retention-days: 14
+
+      - name: Attach to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            /tmp/workdiary-bundle/action.yml
+            /tmp/workdiary-bundle/dist/**
+
+      - name: Publish dist-only tag
+        env:
+          TAG: ${{ steps.tag.outputs.name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/workdiary-release
+          cp -r /tmp/workdiary-bundle/dist /tmp/workdiary-release/dist
+          cp /tmp/workdiary-bundle/action.yml /tmp/workdiary-release/action.yml
+
+          git switch --orphan "release/${TAG}"
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -r /tmp/workdiary-release/dist ./dist
+          cp /tmp/workdiary-release/action.yml ./action.yml
+
+          git add dist action.yml
+          git commit -m "chore: release ${TAG} (bundle dist)"
+
+          git tag -f "${TAG}"
+          git push --force origin "release/${TAG}"
+          git push --force origin "refs/tags/${TAG}"
