@@ -1,0 +1,82 @@
+name: 'Work Diary'
+description: 'Generate a daily work diary using the Work Diary CLI'
+author: 'Sergio Carracedo'
+
+inputs:
+  config-path:
+    description: 'Path to the Work Diary config file'
+    required: false
+    default: 'work'
+  config:
+    description: 'YAML string to use as the Work Diary config (overrides config-path if provided)'
+    required: false
+  date:
+    description: 'Target date (YYYY-MM-DD). Defaults to today (UTC) when omitted.'
+    required: false
+  working-directory:
+    description: 'Directory to run commands in'
+    required: false
+    default: '.'
+
+outputs:
+  date:
+    description: 'Date used for the diary run (YYYY-MM-DD)'
+    value: ${{ steps.resolve_date.outputs.date }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - id: resolve_date
+      name: Resolve diary date
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.date }}" ]; then
+          echo "date=${{ inputs.date }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "date=$(TZ=UTC date +%F)" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Run Work Diary
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        WORKDIARY_OUTPUT_PATH: ${{ inputs.output-path }}
+        NODE_OPTIONS: --enable-source-maps
+        DIARY_DATE: ${{ steps.resolve_date.outputs.date }}
+      run: |
+        config_path="${{ inputs.config-path }}"
+
+        if [ -n "${{ inputs.config }}" ]; then
+          config_path="$(mktemp -p "$RUNNER_TEMP" workdiary-config-XXXX.yaml)"
+          printf '%s\n' "${{ inputs.config }}" > "$config_path"
+        fi
+
+        if [ -z "$config_path" ]; then
+          echo "::error ::Provide either 'config' (YAML string) or 'config-path' to a readable file" >&2
+          exit 1
+        fi
+
+        if [ ! -f "$config_path" ]; then
+          echo "::error ::Config file not found at '$config_path'. Provide 'config' or a valid 'config-path'." >&2
+          exit 1
+        fi
+
+        args=("--config" "$config_path")
+        if [ -n "$DIARY_DATE" ]; then
+          args+=("--date" "$DIARY_DATE")
+        fi
+        node dist/cli.js "${args[@]}"
+
+branding:
+  icon: 'book'
+  color: 'blue'
