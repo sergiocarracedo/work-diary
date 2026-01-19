@@ -1,0 +1,68 @@
+{
+  "name": "workdiary",
+  "version": "0.1.0",
+  "description": "A TypeScript CLI tool that generates daily work summaries from GitHub commits and PRs using AI",
+  "type": "module",
+  "bin": {
+    "workdiary": "./dist/cli.js"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build && chmod +x dist/cli.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "oxfmt --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "prepare": "lefthook install",
+    "diary": "tsx src/cli.ts"
+  },
+  "keywords": [
+    "cli",
+    "github",
+    "diary",
+    "ai",
+    "obsidian",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^22.10.2",
+    "lefthook": "^1.10.1",
+    "oxfmt": "^0.24.0",
+    "oxlint": "^0.16.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^3.0.5"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.13",
+    "@ai-sdk/google": "^3.0.8",
+    "@ai-sdk/openai": "^3.0.10",
+    "@octokit/rest": "^21.0.2",
+    "ai": "^6.0.34",
+    "chalk": "^5.4.1",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7",
+    "googleapis": "^140.0.1",
+    "imapflow": "^1.0.164",
+    "mailparser": "^3.7.1",
+    "node-pop3": "^0.11.0",
+    "ora": "^8.1.1",
+    "yaml": "^2.8.2",
+    "zod": "^4.3.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.0.0"
+}

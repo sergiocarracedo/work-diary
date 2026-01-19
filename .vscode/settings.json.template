@@ -1,0 +1,36 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.oxfmt": "always"
+  },
+  "oxc.fmt.experimental": true,
+  "oxc.enable": true,
+  "oxc.lint.enable": true,
+  "oxc.lint.run": "onSave",
+  "oxc.format.enable": true,
+  "files.associations": {
+    "*.ts": "typescript"
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#7c3aed",
+    "activityBar.background": "#7c3aed",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#a78bfa",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#7c3aed",
+    "statusBar.background": "#6d28d9",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#7c3aed",
+    "statusBarItem.remoteBackground": "#6d28d9",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#6d28d9",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#6d28d999",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#7c3aed"
+}

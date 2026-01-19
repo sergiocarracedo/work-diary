@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: '*.{ts,tsx}'
+      run: npx oxlint {staged_files}
+    format-check:
+      glob: '*.{ts,tsx,json}'
+      run: npx oxfmt --check {staged_files}
+    typecheck:
+      run: npx tsc --noEmit
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}

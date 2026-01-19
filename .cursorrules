@@ -1,0 +1,180 @@
+# Work Diary - AI Agent Rules
+
+## Project Overview
+
+This is a TypeScript CLI tool that automatically generates daily work summaries by fetching GitHub commits and PRs, using AI for summarization, and publishing to an Obsidian vault.
+
+## Technology Stack
+
+- **Language**: TypeScript 5.7+
+- **Package Manager**: pnpm 10+
+- **Build Tool**: Vite 6+
+- **Testing**: Vitest 3+
+- **Linter**: oxlint (oxc project)
+- **Formatter**: oxfmt (oxc project)
+- **Git Hooks**: lefthook
+- **Commit Convention**: Conventional Commits (validated with commitlint)
+
+## Code Style Guidelines
+
+### Formatting Rules
+
+- **NO semicolons** at the end of lines
+- **Single quotes** for strings (except JSX attributes)
+- **Trailing commas** in all multi-line structures
+- **Print width**: 100 characters
+- **Arrow function parentheses**: Always use
+
+### TypeScript Guidelines
+
+- Use strict type checking (all strict flags enabled)
+- Prefer explicit return types for functions
+- Use type imports when only importing types: `import type { ... }`
+- Avoid `any` type; use `unknown` if type is truly unknown
+- Use path aliases: `@/*` for `src/*`
+
+### Code Organization
+
+```
+src/
+├── cli.ts              # CLI entry point with commander setup
+├── commands/           # Command implementations (fetch, summarize, publish, generate)
+├── services/           # External service integrations (GitHub, AI, Obsidian)
+├── state/              # State management for temp files
+├── types/              # TypeScript type definitions
+└── utils/              # Utility functions (logger, config, date)
+```
+
+## Testing Strategy
+
+### Test Structure
+
+- Place tests in `tests/` directory, mirroring `src/` structure
+- Use `*.test.ts` naming convention
+- Group related tests with `describe` blocks
+- Use descriptive test names: `it('should ...')`
+
+### Testing Best Practices
+
+1. **Unit Tests**: Test individual functions and classes in isolation
+2. **Mocking**: Mock external services (GitHub API, AI SDK, filesystem)
+3. **Test Data**: Use fixtures for GitHub API responses
+4. **Coverage**: Aim for >80% code coverage on services and utilities
+5. **Fast Tests**: Keep tests fast by mocking I/O operations
+
+### Key Areas to Test
+
+- **Utils**: Date formatting, config loading, logging
+- **State Management**: Save/load/delete state operations
+- **Services**: Mock external APIs and test business logic
+- **Commands**: Test command flow with mocked services
+
+### Running Tests
+
+```bash
+pnpm test              # Run tests once
+pnpm test:watch        # Run in watch mode
+pnpm test:coverage     # Generate coverage report
+```
+
+## Development Workflow
+
+### Pre-commit Checks
+
+The following checks run automatically before each commit:
+
+1. **Linting**: oxlint checks staged TypeScript files
+2. **Format Check**: oxfmt verifies formatting
+3. **Type Check**: TypeScript compiler checks types
+
+### Commit Message Format
+
+Follow Conventional Commits specification:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types**: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+**Examples**:
+
+```
+feat(github): add support for fetching PR reviews
+fix(ai): handle empty commit lists gracefully
+docs: update README with configuration options
+```
+
+### Making Changes
+
+1. Create a feature branch: `git checkout -b feat/your-feature`
+2. Make changes following code style guidelines
+3. Write/update tests for your changes
+4. Run `pnpm test` to ensure tests pass
+5. Run `pnpm typecheck` to check types
+6. Commit with conventional commit message
+7. Push and create pull request
+
+## Error Handling
+
+- Use try-catch blocks for async operations
+- Log errors with `logger.error()` before re-throwing
+- Provide user-friendly error messages
+- Clean up resources in finally blocks when needed
+
+## Performance Considerations
+
+- Use streaming for large data when possible
+- Cache GitHub API responses in state files
+- Implement rate limiting awareness for GitHub API
+- Minimize AI API calls (they cost money!)
+
+## Security Best Practices
+
+- Never commit `.env` files (use `.env.example`)
+- Store sensitive tokens in environment variables
+- Validate all user inputs
+- Use `zod` for runtime schema validation
+- Keep dependencies updated
+
+## Documentation Standards
+
+- Add JSDoc comments for public APIs
+- Document complex algorithms inline
+- Keep README.md updated with new features
+- Update `.env.example` when adding new config options
+
+## CLI Design Principles
+
+- Support both full pipeline and individual steps
+- Provide helpful error messages
+- Use spinners for long-running operations
+- Log progress with appropriate verbosity
+- Support debug mode via `--debug` flag
+
+## State Management
+
+- Save intermediate state after each step (fetch, summarize, publish)
+- Store state in `~/.workdiary/` directory
+- Use JSON format for state files
+- Allow resuming from failed steps
+- Clean up old state files periodically
+
+## Continuous Integration
+
+- GitHub Actions workflow runs on daily schedule
+- Can be manually triggered with custom date
+- Requires secrets: `GH_TOKEN`, `GH_USERNAME`, `AI_PROVIDER`, `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
+- Commits generated diary back to repository
+
+## Future Enhancements
+
+- Support for GitLab and Bitbucket
+- Multiple diary format options (JSON, HTML)
+- Integration with other note-taking apps
+- Custom AI prompt templates
+- Weekly/monthly summary aggregation
