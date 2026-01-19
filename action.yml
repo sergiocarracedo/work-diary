@@ -6,7 +6,7 @@ inputs:
   config-path:
     description: 'Path to the Work Diary config file'
     required: false
-    default: 'workdiary.config.yaml'
+    default: 'work'
   config:
     description: 'YAML string to use as the Work Diary config (overrides config-path if provided)'
     required: false
@@ -17,10 +17,6 @@ inputs:
     description: 'Directory to run commands in'
     required: false
     default: '.'
-  node-version:
-    description: 'Node.js version to use'
-    required: false
-    default: '20'
 
 outputs:
   date:
@@ -38,8 +34,7 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node-version }}
-        cache: 'npm'
+        node-version: 22
 
     - id: resolve_date
       name: Resolve diary date
