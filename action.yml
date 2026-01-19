@@ -1,0 +1,78 @@
+name: 'Work Diary'
+description: 'Generate a daily work diary using the Work Diary CLI'
+author: 'Sergio Carracedo'
+
+inputs:
+  config-path:
+    description: 'Path to the Work Diary config file'
+    required: false
+    default: 'workdiary.config.yaml'
+  config:
+    description: 'YAML string to use as the Work Diary config (overrides config-path if provided)'
+    required: false
+  date:
+    description: 'Target date (YYYY-MM-DD). Defaults to today (UTC) when omitted.'
+    required: false
+  working-directory:
+    description: 'Directory to run commands in'
+    required: false
+    default: '.'
+
+outputs:
+  date:
+    description: 'Date used for the diary run (YYYY-MM-DD)'
+    value: ${{ steps.resolve_date.outputs.date }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
+        cache-dependency-path: ${{ inputs.working-directory }}/pnpm-lock.yaml
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INSTALL_ARGS: ${{ inputs.install-args }}
+      run: pnpm install $INSTALL_ARGS
+
+    - id: resolve_date
+      name: Resolve diary date
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.date }}" ]; then
+          echo "date=${{ inputs.date }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "date=$(TZ=UTC date +%F)" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Run Work Diary
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        AI_PROVIDER: ${{ inputs.ai-provider }}
+        AI_MODEL: ${{ inputs.ai-model }}
+        AI_API_KEY: ${{ inputs.ai-api-key }}
+        GH_TOKEN: ${{ inputs.gh-token }}
+        GH_USERNAME: ${{ inputs.gh-username }}
+        WORKDIARY_OUTPUT_PATH: ${{ inputs.output-path }}
+        NODE_OPTIONS: --enable-source-maps
+        DIARY_DATE: ${{ steps.resolve_date.outputs.date }}
+      run: |
+        pnpm diary --config "${{ inputs.config-path }}" ${DIARY_DATE:+--date "$DIARY_DATE"}
+
+branding:
+  icon: 'book'
+  color: 'blue'
