@@ -9,6 +9,19 @@ pre-commit:
       run: npx oxfmt --check {staged_files}
     typecheck:
       run: npx tsc --noEmit
+    git-secrets:
+      run: |
+        STAGED="{staged_files}"
+        if [ -z "$STAGED" ]; then
+          exit 0
+        fi
+
+        if ! command -v git-secrets >/dev/null 2>&1; then
+          echo "git-secrets is required. Install from https://github.com/awslabs/git-secrets" >&2
+          exit 1
+        fi
+
+        git secrets --scan -- $STAGED
 
 commit-msg:
   commands:

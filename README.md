@@ -66,6 +66,10 @@ pnpm lint
 # Format
 pnpm format
 
+## Security checks
+
+- Pre-commit hooks run `git-secrets --scan` on staged files. Install git-secrets (https://github.com/awslabs/git-secrets) and register patterns (e.g., `git secrets --register-aws`) before committing.
+
 ## How the CLI works
 
 - The `diary` script runs `src/cli.ts`, which loads `workdiary.config.yaml` (or `--config <file>`) and resolves any `env:VAR_NAME` placeholders against your environment variables.
