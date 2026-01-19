@@ -38,13 +38,8 @@ OBSIDIAN_VAULT_PATH=/path/to/your/vault
 ## Usage
 
 ```bash
-# Run all steps (fetch, summarize, publish)
+# Run the workflow (fetch → summarize → publish)
 pnpm diary
-
-# Run individual steps
-pnpm diary fetch
-pnpm diary summarize
-pnpm diary publish
 
 # Specify date (defaults to today)
 pnpm diary --date 2026-01-13
@@ -70,6 +65,14 @@ pnpm lint
 
 # Format
 pnpm format
+
+## How the CLI works
+
+- The `diary` script runs `src/cli.ts`, which loads `workdiary.config.yaml` (or `--config <file>`) and resolves any `env:VAR_NAME` placeholders against your environment variables.
+- It computes the target date (today by default, or `--date YYYY-MM-DD`) and builds a shared context with logging and date formatting.
+- Input plugins (GitHub, Slack, Email) run in parallel to fetch raw data and optionally summarize with your configured AI provider.
+- The formatter plugin turns the collected summaries into final output content.
+- Output plugins (console, file, etc.) write the formatted result to their destinations.
 ```
 
 ## Tech Stack

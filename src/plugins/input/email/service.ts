@@ -183,10 +183,11 @@ export class EmailService {
     end: Date,
   ): Promise<EmailMessage[]> {
     const client = new Pop3Command({
+      user: config.user,
+      password: config.password,
       host: config.host,
       port: config.port,
-      tls: config.tls,
-      tlsOptions: config.tls ? { rejectUnauthorized: false } : undefined,
+      ...(config.tls ? { tls: true, tlsOptions: { rejectUnauthorized: false } } : { tls: false }),
     })
 
     const messages: EmailMessage[] = []
