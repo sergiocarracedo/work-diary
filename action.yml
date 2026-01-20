@@ -6,7 +6,7 @@ inputs:
   config-path:
     description: 'Path to the Work Diary config file'
     required: false
-    default: 'work'
+    default: 'workdiary.config.yaml'
   config:
     description: 'YAML string to use as the Work Diary config (overrides config-path if provided)'
     required: false
@@ -53,12 +53,13 @@ runs:
         WORKDIARY_OUTPUT_PATH: ${{ inputs.output-path }}
         NODE_OPTIONS: --enable-source-maps
         DIARY_DATE: ${{ steps.resolve_date.outputs.date }}
+        CONFIG_YAML: ${{ inputs.config }}
       run: |
         config_path="${{ inputs.config-path }}"
 
-        if [ -n "${{ inputs.config }}" ]; then
+        if [ -n "$CONFIG_YAML" ]; then
           config_path="$(mktemp -p "$RUNNER_TEMP" workdiary-config-XXXX.yaml)"
-          printf '%s\n' "${{ inputs.config }}" > "$config_path"
+          printf '%s\n' "$CONFIG_YAML" > "$config_path"
         fi
 
         if [ -z "$config_path" ]; then
