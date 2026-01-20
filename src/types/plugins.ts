@@ -47,6 +47,10 @@ export type SummaryResult = {
  */
 export type Plugin<TConfig extends z.ZodTypeAny> = {
   name: string
+  /**
+   * Whether the plugin is marked as experimental
+   */
+  experimental?: boolean
   configSchema: TConfig
   parseConfig: (rawConfig: unknown) => z.infer<TConfig>
   description?: string

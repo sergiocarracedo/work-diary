@@ -9,7 +9,8 @@ const formatIssuePath = (path: (string | number)[]): string => {
 
 const buildErrorMessage = (pluginName: string, error: ZodError): string => {
   const issueLines = error.issues.map(
-    (issue) => `- ${formatIssuePath(issue.path.filter((p): p is string | number => typeof p !== 'symbol'))}: ${issue.message}`,
+    (issue) =>
+      `- ${formatIssuePath(issue.path.filter((p): p is string | number => typeof p !== 'symbol'))}: ${issue.message}`,
   )
 
   return [

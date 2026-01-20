@@ -2,46 +2,33 @@
   "name": "workdiary",
   "version": "0.1.0",
   "description": "A TypeScript CLI tool that generates daily work summaries from GitHub commits and PRs using AI",
-  "type": "module",
+  "keywords": [
+    "ai",
+    "cli",
+    "diary",
+    "github",
+    "obsidian",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "",
   "bin": {
     "workdiary": "./dist/cli.js"
   },
+  "type": "module",
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build && chmod +x dist/cli.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint --fix src",
+    "lint": "oxlint src/",
+    "lint:fix": "oxlint --fix src/",
     "format": "oxfmt --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "oxfmt --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "prepare": "lefthook install",
     "diary": "tsx src/cli.ts"
-  },
-  "keywords": [
-    "cli",
-    "github",
-    "diary",
-    "ai",
-    "obsidian",
-    "typescript"
-  ],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "@commitlint/cli": "^19.5.0",
-    "@commitlint/config-conventional": "^19.5.0",
-    "@types/mailparser": "^3.4.6",
-    "@types/node": "^22.10.2",
-    "lefthook": "^1.10.1",
-    "oxfmt": "^0.24.0",
-    "oxlint": "^0.16.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.5",
-    "vitest": "^3.0.5"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.13",
@@ -59,6 +46,19 @@
     "ora": "^8.1.1",
     "yaml": "^2.8.2",
     "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^22.10.2",
+    "lefthook": "^1.10.1",
+    "oxfmt": "^0.24.0",
+    "oxlint": "^0.16.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^3.0.5"
   },
   "engines": {
     "node": ">=20.0.0",
