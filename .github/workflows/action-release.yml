@@ -91,7 +91,7 @@ jobs:
           cp -r /tmp/workdiary-release/dist ./dist
           cp /tmp/workdiary-release/action.yml ./action.yml
 
-          git add dist action.yml
+          git add -f dist action.yml
           git commit -m "chore: release ${TAG} (bundle dist)"
 
           git tag -f "${TAG}"
