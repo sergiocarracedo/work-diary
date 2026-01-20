@@ -25,7 +25,7 @@ export default defineConfig({
       ],
     },
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
   },
   resolve: {
     alias: {

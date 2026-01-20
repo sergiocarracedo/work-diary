@@ -72,11 +72,18 @@ runs:
           exit 1
         fi
 
+        cli_path="$GITHUB_ACTION_PATH/dist/cli.js"
+
+        if [ ! -f "$cli_path" ]; then
+          echo "::error ::Built CLI not found at $cli_path. Ensure you are using a release tag that includes dist/." >&2
+          exit 1
+        fi
+
         args=("--config" "$config_path")
         if [ -n "$DIARY_DATE" ]; then
           args+=("--date" "$DIARY_DATE")
         fi
-        node dist/cli.js "${args[@]}"
+        node "$cli_path" "${args[@]}"
 
 branding:
   icon: 'book'

@@ -61,7 +61,7 @@ const GitHubInputPlugin: Plugin<typeof gitGithubConfigSchema> = {
 
     return {
       pluginName: 'GitHub',
-      summary: activityEvents ? summary + `\n\n- ${stats.join('\n- ')}` : 'No activity recorded.',
+      summary: activityEvents ? summary + `\n\n- ${stats.join(' - ')}` : 'No activity recorded.',
       metadata: {
         comments: rawData.comments,
         commits: rawData.commits,
