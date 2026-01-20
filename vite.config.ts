@@ -1,6 +1,5 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
-import pkg from './package.json' with { type: 'json' }
 
 const nodeBuiltins = [
   'fs',
@@ -26,14 +25,6 @@ const nodeBuiltins = [
   'process',
 ]
 
-const dependencyNames = Object.keys(pkg.dependencies ?? {})
-
-const isExternal = (id: string): boolean => {
-  if (id.startsWith('node:')) return true
-  if (nodeBuiltins.includes(id)) return true
-  return dependencyNames.some((dep) => id === dep || id.startsWith(`${dep}/`))
-}
-
 export default defineConfig({
   build: {
     lib: {
@@ -44,7 +35,7 @@ export default defineConfig({
     target: 'node20',
     outDir: 'dist',
     rollupOptions: {
-      external: isExternal,
+      external: [/^node:.*/, ...nodeBuiltins],
       output: {
         inlineDynamicImports: true,
         entryFileNames: 'cli.js',
