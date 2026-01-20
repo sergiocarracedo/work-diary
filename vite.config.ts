@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 
 const nodeBuiltins = [
@@ -25,6 +26,8 @@ const nodeBuiltins = [
   'process',
 ]
 
+const analyze = process.env.ANALYZE === 'true' || process.env.ANALYZE === '1'
+
 export default defineConfig({
   build: {
     lib: {
@@ -36,6 +39,16 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       external: [/^node:.*/, ...nodeBuiltins],
+      plugins: analyze
+        ? [
+            visualizer({
+              filename: 'dist/cli-visualizer.html',
+              template: 'treemap',
+              gzipSize: true,
+              brotliSize: true,
+            }),
+          ]
+        : [],
       output: {
         inlineDynamicImports: true,
         entryFileNames: 'cli.js',
