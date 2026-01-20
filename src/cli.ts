@@ -19,14 +19,14 @@ type CliOptions = {
 
 const resolveEnvPlaceholders = (value: unknown): unknown => {
   if (typeof value === 'string') {
-    const envMatch = value.match(/^env:(.+)$/i)
+    const envMatch = value.match(/^env:([A-Z0-9_]+)$/i)
 
     if (envMatch && envMatch[1]) {
       const envVar = envMatch[1]
       const envValue = process.env[envVar]
 
       if (envValue === undefined) {
-        throw new Error(`Environment variable ${envVar} is not set`)
+        logger.error(`Environment variable ${envVar} is not set`)
       }
 
       return envValue

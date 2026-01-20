@@ -74,11 +74,6 @@ runs:
 
         cli_path="$GITHUB_ACTION_PATH/dist/cli.js"
 
-        pwd
-
-        echo "ACTION PATH: $GITHUB_ACTION_PATH"
-
-
         if [ ! -f "$cli_path" ]; then
           echo "::error ::Built CLI not found at $cli_path. Ensure you are using a release tag that includes dist/." >&2
           exit 1

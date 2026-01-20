@@ -1,12 +1,7 @@
 import { Logger } from '@/types'
 import type { FormatterPlugin, InputPlugin, OutputPlugin, Plugin } from '@/types/plugins'
 import { logger } from '@/utils/logger'
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
 import type { z } from 'zod/v4'
-
-const pluginFileExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs'])
 
 type AnyPlugin = Plugin<z.ZodTypeAny>
 
@@ -39,44 +34,31 @@ export class PluginRegistry {
     )
   }
 
-  private async loadPlugins(): Promise<Record<string, PluginEntry>> {
-    const baseDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)))
+  private async loadPlugins(): Promise<void> {
+    const modules = import.meta.glob<PluginModule>(
+      ['./**/*.{ts,tsx,js,mjs,cjs}', '!./**/*.test.*', '!./**/*.spec.*'],
+      { eager: true },
+    )
 
-    const collectPluginFiles = async (dir: string): Promise<string[]> => {
-      const entries = await fs.readdir(dir, { withFileTypes: true })
-      const files: string[] = []
+    this.logger.info(`Loading plugins from bundle: ${Object.keys(modules).length} candidates`)
 
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name)
-        if (entry.isDirectory()) {
-          files.push(...(await collectPluginFiles(fullPath)))
-          continue
-        }
-        if (pluginFileExtensions.has(path.extname(entry.name))) {
-          files.push(fullPath)
-        }
+    for (const [file, mod] of Object.entries(modules)) {
+      if (/\.(test|spec)\.[^.]+$/.test(file)) {
+        this.logger.debug(`Skipping test module: ${file}`)
+        continue
       }
 
-      return files
-    }
-
-    this.logger.info(`Loading plugins from filesystem: ${baseDir}`)
-    const files = await collectPluginFiles(baseDir)
-    const registry: Record<string, PluginEntry> = {}
-
-    for (const file of files) {
-      const mod = (await import(pathToFileURL(file).href)) as PluginModule
       const plugin = mod?.default
       if (this.isPluginLike(plugin)) {
         const pluginEntry: PluginEntry = this.register(plugin)
-
         this.logger.info(
           `Loaded plugin: ${pluginEntry.plugin.name}, capabilities: ${pluginEntry.capabilities.join(', ')}`,
         )
+        continue
       }
-    }
 
-    return registry
+      this.logger.debug(`Skipping non-plugin module: ${file}`)
+    }
   }
 
   private getPluginCapabilities(plugin: AnyPlugin): PluginCapability[] {
