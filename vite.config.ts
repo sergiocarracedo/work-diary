@@ -23,6 +23,12 @@ export default defineConfig({
         'crypto',
         'os',
       ],
+      output: {
+        inlineDynamicImports: true,
+        entryFileNames: 'cli.js',
+        chunkFileNames: 'cli.js',
+        assetFileNames: 'assets/[name][extname]',
+      },
     },
     minify: false,
     sourcemap: false,
