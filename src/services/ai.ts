@@ -32,8 +32,8 @@ export class AIService {
     throw new Error(`Unsupported AI provider: ${this.config.provider}`)
   }
 
-  public async generate(prompt: string, temperature: number): Promise<string> {
-    this.logger.info('Generating AI text...')
+  public async generate(plugin: string, prompt: string, temperature: number): Promise<string> {
+    this.logger.info(`[ ${plugin} ] Generating AI text...`)
 
     const model = this.getModel()
 

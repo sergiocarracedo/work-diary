@@ -43,7 +43,7 @@ export async function runWorkflow(date: Date, config: Config): Promise<void> {
       const result = await plugin.retrieve(
         {
           ...ctx,
-          aiSummarizer: (prompt: string) => ai.generate(prompt, 0.7),
+          aiSummarizer: (prompt: string) => ai.generate(input.plugin, prompt, 0.7),
         },
         parsedConfig,
       )

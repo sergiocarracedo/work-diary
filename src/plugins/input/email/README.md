@@ -20,6 +20,12 @@ All variants support optional address filters:
 - `sentMailbox` (string, default `Sent`) — Sent folder name.
 - `maxMessages` (number, default `200`) — Max messages to pull across inbox+sent.
 
+**Mailbox naming tips (IMAP)**
+
+- Folder names must match your provider exactly (including casing/spaces). Common sent names: `Sent`, `Sent Items`, `INBOX.Sent`, `[Gmail]/Sent Mail`.
+- Gmail IMAP: enable IMAP in Gmail, use an App Password with 2FA, and typically set `mailbox: "[Gmail]/All Mail"` and `sentMailbox: "[Gmail]/Sent Mail"`. If you use `All Mail`, you may get both inbox and sent in one folder—set `sentMailbox` to a non-sent folder (or leave the default) if you want to avoid double-counting sent items.
+- If a folder is missing, the plugin now warns and skips it; update `sentMailbox`/`mailbox` to the correct names to include it.
+
 ### POP3
 
 - `provider` — `pop3`

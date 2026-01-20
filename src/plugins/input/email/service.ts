@@ -138,7 +138,20 @@ export class EmailService {
     const collected: EmailMessage[] = []
 
     const fetchMailbox = async (mailbox: string, mailboxType: 'inbox' | 'sent'): Promise<void> => {
-      const lock = await client.getMailboxLock(mailbox)
+      let lock
+      try {
+        lock = await client.getMailboxLock(mailbox)
+      } catch (error) {
+        const err = error as { mailboxMissing?: boolean; message?: string }
+        if (err?.mailboxMissing) {
+          this.logger.warn(
+            `IMAP mailbox "${mailbox}" (${mailboxType}) not found; skipping ${mailboxType} sync. ` +
+              'Configure email.sentMailbox to match your provider (e.g., "Sent Items" or "INBOX.Sent").',
+          )
+          return
+        }
+        throw error
+      }
       try {
         for await (const message of client.fetch(
           { since: start, before: new Date(end.getTime() + 1000) },
@@ -158,7 +171,7 @@ export class EmailService {
           }
         }
       } finally {
-        lock.release()
+        lock?.release()
       }
     }
 
