@@ -2,12 +2,18 @@
 
 Generate a daily work log from your GitHub activity using AI. Available as a prebuilt GitHub Action and a local TypeScript CLI.
 
-Features
+## Features
 
 - Fetch Your daily activity, summarize with AI (OpenAI, Anthropic, Google), and outputs it to a file, console, for example to obsidian
 - Pluggable inputs/outputs (GitHub, email, Slack → Markdown → console/file)
 
-Use as a GitHub Action
+## Available plugins
+
+- Inputs: [src/plugins/input/github/README.md](src/plugins/input/github/README.md), [src/plugins/input/email/README.md](src/plugins/input/email/README.md), [src/plugins/input/slack/README.md](src/plugins/input/slack/README.md)
+- Formatter: [src/plugins/formatter/markdown/README.md](src/plugins/formatter/markdown/README.md)
+- Outputs: [src/plugins/output/console/README.md](src/plugins/output/console/README.md), [src/plugins/output/file/README.md](src/plugins/output/file/README.md)
+
+## Use as a GitHub Action
 
 - Action ref: use a release tag (e.g., sergiocarracedo/workdiary@v1.0.0). Release tags contain only action.yml and dist/; dist/ stays ignored on main.
 - Config source: provide either a config file path (config-path, default workdiary.config.yaml) or inline YAML via config. The action fails if neither is provided or the path is unreadable.
@@ -18,7 +24,7 @@ Use as a GitHub Action
   - working-directory: string, default .
   - node-version: string, default 20
 
-Minimal config example
+## Minimal config example
 
 ```yaml
 ai:
@@ -41,7 +47,7 @@ outputs:
    path: 'obsidian/Daily Notes/{date}.md'
 ```
 
-Workflow example
+## Github Actions Workflow example
 
 ```yaml
 name: Daily Work Diary
@@ -65,8 +71,6 @@ jobs:
      GH_TOKEN: ${{ secrets.GH_TOKEN }}
      GH_USERNAME: ${{ secrets.GH_USERNAME }}
 ```
-
-[CLI](CLI.md)
 
 License
 MIT

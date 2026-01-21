@@ -1,6 +1,6 @@
 {
   "name": "workdiary",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A TypeScript CLI tool that generates daily work summaries from GitHub commits and PRs using AI",
   "keywords": [
     "ai",
@@ -63,7 +63,7 @@
     "vitest": "^3.0.5"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
   },
   "packageManager": "pnpm@10.0.0"
