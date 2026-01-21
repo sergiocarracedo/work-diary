@@ -9,9 +9,15 @@ Generate a daily work log from your GitHub activity using AI. Available as a pre
 
 ## Available plugins
 
-- Inputs: [src/plugins/input/github/README.md](src/plugins/input/github/README.md), [src/plugins/input/email/README.md](src/plugins/input/email/README.md), [src/plugins/input/slack/README.md](src/plugins/input/slack/README.md)
-- Formatter: [src/plugins/formatter/markdown/README.md](src/plugins/formatter/markdown/README.md)
-- Outputs: [src/plugins/output/console/README.md](src/plugins/output/console/README.md), [src/plugins/output/file/README.md](src/plugins/output/file/README.md)
+- Inputs:
+  - [Github](src/plugins/input/github/README.md)
+  - [Email](src/plugins/input/email/README.md)
+  - [Slack](src/plugins/input/slack/README.md)
+- Formatter:
+  - [Markdown](src/plugins/formatter/markdown/README.md)
+- Outputs:
+  - [Console](src/plugins/output/console/README.md)
+  - [File](src/plugins/output/file/README.md)
 
 ## Use as a GitHub Action
 
